@@ -3,7 +3,7 @@
     <div v-if="loading" class="text-center py-8">Loading...</div>
     <div v-else-if="pr">
       <div class="flex items-center gap-3 mb-6">
-        <router-link :to="{ name: 'PurchaseRequisitions' }" class="text-gray-500 hover:text-gray-700">&larr; Back</router-link>
+        <router-link :to="{ name: 'PurchaseRequisitions' }" class="inline-flex items-center justify-center w-8 h-8 rounded-full text-slate-500 hover:bg-slate-100 hover:text-slate-700 transition-colors"><svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5"/></svg></router-link>
         <h1 class="text-2xl font-bold text-gray-800">{{ pr.number }}</h1>
         <span :class="prStatusBadge(pr.status)" class="px-2 py-1 text-xs rounded-full">{{ formatStatus(pr.status) }}</span>
       </div>

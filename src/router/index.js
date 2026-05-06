@@ -19,28 +19,38 @@ const routes = [
         component: () => import('../views/dashboard/DashboardView.vue')
       },
       {
-        path: 'master/items',
-        name: 'MasterItems',
-        component: () => import('../views/master/MasterItemView.vue')
-      },
-      {
-        path: 'master/items/:id',
-        name: 'MasterItemDetail',
-        component: () => import('../views/master/MasterItemDetailView.vue'),
-        props: true
-      },
-      {
-        path: 'master/vendors',
-        name: 'MasterVendors',
-        component: () => import('../views/master/MasterVendorView.vue'),
-        meta: { allowedRoles: ['purchasing', 'accounting'] }
-      },
-      {
-        path: 'master/vendors/:id',
-        name: 'MasterVendorDetail',
-        component: () => import('../views/master/MasterVendorDetailView.vue'),
-        props: true,
-        meta: { allowedRoles: ['purchasing', 'accounting'] }
+        path: 'master',
+        component: () => import('../views/master/MasterDataView.vue'),
+        children: [
+          {
+            path: '',
+            redirect: { name: 'MasterItems' }
+          },
+          {
+            path: 'items',
+            name: 'MasterItems',
+            component: () => import('../views/master/MasterItemView.vue')
+          },
+          {
+            path: 'items/:id',
+            name: 'MasterItemDetail',
+            component: () => import('../views/master/MasterItemDetailView.vue'),
+            props: true
+          },
+          {
+            path: 'vendors',
+            name: 'MasterVendors',
+            component: () => import('../views/master/MasterVendorView.vue'),
+            meta: { allowedRoles: ['purchasing', 'accounting'] }
+          },
+          {
+            path: 'vendors/:id',
+            name: 'MasterVendorDetail',
+            component: () => import('../views/master/MasterVendorDetailView.vue'),
+            props: true,
+            meta: { allowedRoles: ['purchasing', 'accounting'] }
+          },
+        ]
       },
       {
         path: 'departments',
@@ -68,70 +78,132 @@ const routes = [
         component: () => import('../views/dashboard/NotificationsView.vue')
       },
       {
-        path: 'procurement/material-requests',
-        name: 'MaterialRequests',
-        component: () => import('../views/procurement/MaterialRequestView.vue')
+        path: 'procurement',
+        component: () => import('../views/procurement/ProcurementView.vue'),
+        children: [
+          {
+            path: '',
+            redirect: { name: 'MaterialRequests' }
+          },
+          {
+            path: 'material-requests',
+            name: 'MaterialRequests',
+            component: () => import('../views/procurement/MaterialRequestView.vue')
+          },
+          {
+            path: 'material-requests/:id',
+            name: 'MaterialRequestDetail',
+            component: () => import('../views/procurement/MaterialRequestDetailView.vue'),
+            props: true
+          },
+          {
+            path: 'service-requests',
+            name: 'ServiceRequests',
+            component: () => import('../views/procurement/ServiceRequestView.vue')
+          },
+          {
+            path: 'service-requests/:id',
+            name: 'ServiceRequestDetail',
+            component: () => import('../views/procurement/ServiceRequestDetailView.vue'),
+            props: true
+          },
+        ]
       },
       {
-        path: 'procurement/material-requests/:id',
-        name: 'MaterialRequestDetail',
-        component: () => import('../views/procurement/MaterialRequestDetailView.vue'),
-        props: true
+        path: 'purchase',
+        component: () => import('../views/purchase/PurchaseView.vue'),
+        children: [
+          {
+            path: '',
+            redirect: { name: 'PurchaseRequisitions' }
+          },
+          {
+            path: 'requisitions',
+            name: 'PurchaseRequisitions',
+            component: () => import('../views/procurement/PurchaseRequisitionView.vue')
+          },
+          {
+            path: 'requisitions/:id',
+            name: 'PurchaseRequisitionDetail',
+            component: () => import('../views/procurement/PurchaseRequisitionDetailView.vue'),
+            props: true
+          },
+          {
+            path: 'orders',
+            name: 'PurchaseOrders',
+            component: () => import('../views/procurement/PurchaseOrderView.vue')
+          },
+          {
+            path: 'orders/:id',
+            name: 'PurchaseOrderDetail',
+            component: () => import('../views/procurement/PurchaseOrderDetailView.vue'),
+            props: true
+          },
+        ]
       },
       {
-        path: 'procurement/service-requests',
-        name: 'ServiceRequests',
-        component: () => import('../views/procurement/ServiceRequestView.vue')
+        path: 'docs',
+        component: () => import('../views/docs/DocsView.vue'),
+        children: [
+          {
+            path: '',
+            redirect: { name: 'PreReceivingDocuments' }
+          },
+          {
+            path: 'pre-receiving',
+            name: 'PreReceivingDocuments',
+            component: () => import('../views/procurement/PreReceivingDocumentView.vue')
+          },
+          {
+            path: 'pre-receiving/:id',
+            name: 'PreReceivingDocumentDetail',
+            component: () => import('../views/procurement/PreReceivingDocumentDetailView.vue'),
+            props: true
+          },
+          {
+            path: 'receiving',
+            name: 'ReceivingDocuments',
+            component: () => import('../views/procurement/ReceivingDocumentView.vue')
+          },
+          {
+            path: 'receiving/:id',
+            name: 'ReceivingDocumentDetail',
+            component: () => import('../views/procurement/ReceivingDocumentDetailView.vue'),
+            props: true
+          },
+        ]
       },
       {
-        path: 'procurement/service-requests/:id',
-        name: 'ServiceRequestDetail',
-        component: () => import('../views/procurement/ServiceRequestDetailView.vue'),
-        props: true
-      },
-      {
-        path: 'procurement/purchase-requisitions',
-        name: 'PurchaseRequisitions',
-        component: () => import('../views/procurement/PurchaseRequisitionView.vue')
-      },
-      {
-        path: 'procurement/purchase-requisitions/:id',
-        name: 'PurchaseRequisitionDetail',
-        component: () => import('../views/procurement/PurchaseRequisitionDetailView.vue'),
-        props: true
-      },
-      {
-        path: 'procurement/purchase-orders',
-        name: 'PurchaseOrders',
-        component: () => import('../views/procurement/PurchaseOrderView.vue')
-      },
-      {
-        path: 'procurement/purchase-orders/:id',
-        name: 'PurchaseOrderDetail',
-        component: () => import('../views/procurement/PurchaseOrderDetailView.vue'),
-        props: true
-      },
-      {
-        path: 'procurement/pre-receiving-documents',
-        name: 'PreReceivingDocuments',
-        component: () => import('../views/procurement/PreReceivingDocumentView.vue')
-      },
-      {
-        path: 'procurement/pre-receiving-documents/:id',
-        name: 'PreReceivingDocumentDetail',
-        component: () => import('../views/procurement/PreReceivingDocumentDetailView.vue'),
-        props: true
-      },
-      {
-        path: 'procurement/receiving-documents',
-        name: 'ReceivingDocuments',
-        component: () => import('../views/procurement/ReceivingDocumentView.vue')
-      },
-      {
-        path: 'procurement/receiving-documents/:id',
-        name: 'ReceivingDocumentDetail',
-        component: () => import('../views/procurement/ReceivingDocumentDetailView.vue'),
-        props: true
+        path: 'delivery',
+        component: () => import('../views/delivery/DeliveryView.vue'),
+        children: [
+          {
+            path: '',
+            redirect: { name: 'DeliveryInstructions' }
+          },
+          {
+            path: 'instructions',
+            name: 'DeliveryInstructions',
+            component: () => import('../views/delivery/DeliveryInstructionView.vue')
+          },
+          {
+            path: 'instructions/:id',
+            name: 'DeliveryInstructionDetail',
+            component: () => import('../views/delivery/DeliveryInstructionDetailView.vue'),
+            props: true
+          },
+          {
+            path: 'notes',
+            name: 'DeliveryNotes',
+            component: () => import('../views/delivery/DeliveryNoteView.vue')
+          },
+          {
+            path: 'notes/:id',
+            name: 'DeliveryNoteDetail',
+            component: () => import('../views/delivery/DeliveryNoteDetailView.vue'),
+            props: true
+          },
+        ]
       },
       {
         path: 'delivery/work-orders',
@@ -153,28 +225,6 @@ const routes = [
         path: 'delivery/acceptance-letters/:id',
         name: 'AcceptanceLetterDetail',
         component: () => import('../views/delivery/AcceptanceLetterDetailView.vue'),
-        props: true
-      },
-      {
-        path: 'delivery/delivery-instructions',
-        name: 'DeliveryInstructions',
-        component: () => import('../views/delivery/DeliveryInstructionView.vue')
-      },
-      {
-        path: 'delivery/delivery-instructions/:id',
-        name: 'DeliveryInstructionDetail',
-        component: () => import('../views/delivery/DeliveryInstructionDetailView.vue'),
-        props: true
-      },
-      {
-        path: 'delivery/delivery-notes',
-        name: 'DeliveryNotes',
-        component: () => import('../views/delivery/DeliveryNoteView.vue')
-      },
-      {
-        path: 'delivery/delivery-notes/:id',
-        name: 'DeliveryNoteDetail',
-        component: () => import('../views/delivery/DeliveryNoteDetailView.vue'),
         props: true
       },
       {
