@@ -12,7 +12,7 @@
         <span>Dashboard</span>
       </router-link>
 
-      <template v-for="group in menuGroups" :key="group.label">
+      <template v-for="group in filteredMenuGroups" :key="group.label">
         <template v-if="group.children">
           <button
             @click="toggleGroup(group.label)"
@@ -47,8 +47,9 @@
 </template>
 
 <script setup>
-import { reactive, watch, markRaw } from 'vue'
+import { reactive, watch, markRaw, computed } from 'vue'
 import { useRoute } from 'vue-router'
+import { useAuthStore } from '../../stores/auth'
 import {
   HomeIcon, Squares2X2Icon, ClipboardDocumentListIcon, ShoppingCartIcon,
   DocumentTextIcon, WrenchIcon, CheckBadgeIcon, TruckIcon,
@@ -57,6 +58,7 @@ import {
 } from '@heroicons/vue/24/outline'
 
 const route = useRoute()
+const authStore = useAuthStore()
 const openGroups = reactive({})
 
 const detailRouteMap = {
@@ -133,6 +135,21 @@ const menuGroups = [
   { label: 'Approval Tiers', route: 'ApprovalTiers', iconComponent: markRaw(AdjustmentsHorizontalIcon) },
 ]
 
+const filteredMenuGroups = computed(() => {
+  const canAccessVendors = authStore.hasRole('purchasing') || authStore.hasRole('accounting')
+
+  return menuGroups
+    .map(group => {
+      if (!group.children) return group
+      const children = group.children.filter(child => {
+        if (child.route === 'MasterVendors') return canAccessVendors
+        return true
+      })
+      return { ...group, children }
+    })
+    .filter(group => !group.children || group.children.length > 0)
+})
+
 function toggleGroup(label) {
   openGroups[label] = !openGroups[label]
 }
@@ -143,7 +160,7 @@ function isGroupActive(group) {
 }
 
 watch(() => route.name, () => {
-  for (const group of menuGroups) {
+  for (const group of filteredMenuGroups.value) {
     if (group.children && isGroupActive(group)) {
       openGroups[group.label] = true
     }

@@ -172,6 +172,7 @@ async function validateItem(action) {
     })
     showDeclineModal.value = false
     await fetchItem()
+    await fetchAuditTrail()
   } catch (err) {
     validateError.value = err.response?.data?.message || 'Validation failed'
   } finally {
@@ -184,6 +185,7 @@ async function resubmitItem() {
     await api.post(`/master-items/${route.params.id}/resubmit`, resubmitForm)
     showResubmitModal.value = false
     await fetchItem()
+    await fetchAuditTrail()
   } catch {}
 }
 

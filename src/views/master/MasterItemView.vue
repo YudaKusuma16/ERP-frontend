@@ -40,6 +40,7 @@
             <th class="px-5 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Type</th>
             <th class="px-5 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Unit</th>
             <th class="px-5 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Status</th>
+            <th class="px-5 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Action</th>
           </tr>
         </thead>
         <tbody class="divide-y divide-slate-100">
@@ -52,9 +53,12 @@
             <td class="px-5 py-3">
               <span :class="statusBadgeClass(item.status)" class="inline-flex items-center px-2.5 py-0.5 text-xs font-medium rounded-full">{{ formatStatus(item.status) }}</span>
             </td>
+            <td class="px-5 py-3 text-sm">
+              <router-link :to="{ name: 'MasterItemDetail', params: { id: item.id } }" class="font-medium text-primary-700 hover:text-primary-800 transition-colors">View</router-link>
+            </td>
           </tr>
           <tr v-if="!items.data?.length">
-            <td colspan="4" class="px-5 py-16 text-center text-sm text-slate-400">No items found</td>
+            <td colspan="5" class="px-5 py-16 text-center text-sm text-slate-400">No items found</td>
           </tr>
         </tbody>
       </table>

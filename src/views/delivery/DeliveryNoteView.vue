@@ -32,6 +32,7 @@
             <th class="px-5 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">DI Reference</th>
             <th class="px-5 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Driver / Vehicle</th>
             <th class="px-5 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Status</th>
+            <th class="px-5 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Action</th>
           </tr>
         </thead>
         <tbody class="divide-y divide-slate-100">
@@ -41,8 +42,9 @@
             <td class="px-5 py-3 text-sm text-slate-600">{{ dn.delivery_instruction?.number || '-' }}</td>
             <td class="px-5 py-3 text-sm text-slate-600">{{ dn.driver || '-' }} / {{ dn.vehicle || '-' }}</td>
             <td class="px-5 py-3"><span :class="[statusBadge(dn.status), 'inline-flex items-center px-2.5 py-0.5 text-xs font-medium rounded-full']">{{ formatStatus(dn.status) }}</span></td>
+            <td class="px-5 py-3 text-sm"><router-link :to="{ name: 'DeliveryNoteDetail', params: { id: dn.id } }" class="font-medium text-primary-700 hover:text-primary-800 transition-colors">View</router-link></td>
           </tr>
-          <tr v-if="!dns.data?.length"><td colspan="5" class="px-5 py-16 text-center text-sm text-slate-400">No delivery notes found</td></tr>
+          <tr v-if="!dns.data?.length"><td colspan="6" class="px-5 py-16 text-center text-sm text-slate-400">No delivery notes found</td></tr>
         </tbody>
       </table>
 

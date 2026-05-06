@@ -52,7 +52,7 @@
                   <td v-if="mr.status === 'pending_pihak_2' || mr.status === 'pending_pihak_ii'" class="px-4 py-3">
                     <input type="checkbox" v-model="flaggedItems" :value="item.id" class="rounded" />
                   </td>
-                  <td class="px-4 py-3 text-sm">{{ item.item?.name || '-' }}</td>
+                  <td class="px-4 py-3 text-sm">{{ item.item?.name || item.item_name || '-' }}</td>
                   <td class="px-4 py-3 text-sm">{{ item.qty }}</td>
                   <td class="px-4 py-3 text-sm">{{ item.unit }}</td>
                   <td class="px-4 py-3 text-sm">{{ item.description || '-' }}</td>

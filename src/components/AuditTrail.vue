@@ -4,9 +4,9 @@
     <div v-if="!logs?.length" class="text-sm text-slate-400 py-2">No records yet</div>
     <div v-else class="flow-root">
       <ul role="list" class="-mb-8">
-        <li v-for="(log, index) in logs" :key="log.id || index">
+        <li v-for="(log, index) in sortedLogs" :key="log.id || index">
           <div class="relative pb-8">
-            <span v-if="index !== logs.length - 1" class="absolute left-4 top-4 -ml-px h-full w-0.5 bg-slate-200" aria-hidden="true"></span>
+            <span v-if="index !== sortedLogs.length - 1" class="absolute left-4 top-4 -ml-px h-full w-0.5 bg-slate-200" aria-hidden="true"></span>
             <div class="relative flex items-start gap-3">
               <div class="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-200">
                 <div class="h-2 w-2 rounded-full bg-slate-500"></div>
@@ -29,10 +29,19 @@
 </template>
 
 <script setup>
-import { formatDate, formatDateTime } from '../utils/format'
+import { computed } from 'vue'
+import { formatDateTime } from '../utils/format'
 
-defineProps({
+const props = defineProps({
   logs: { type: Array, default: () => [] }
+})
+
+const sortedLogs = computed(() => {
+  return [...(props.logs || [])].sort((a, b) => {
+    const aTime = new Date(a?.created_at || 0).getTime()
+    const bTime = new Date(b?.created_at || 0).getTime()
+    return aTime - bTime
+  })
 })
 
 const statusLabels = {
@@ -40,7 +49,7 @@ const statusLabels = {
   pending_dept_head: 'Pending Dept Head', pending_pihak_ii: 'Pending Pihak II',
   pending_pihak_i_pricing: 'Pending Pihak I', pending_approval: 'Pending Approval',
   pending_input: 'Pending Input', validating: 'Validating', approved: 'Approved',
-  active: 'Active', declined: 'Declined', pr_created: 'PR Created',
+  active: 'Updated', declined: 'Declined', pr_created: 'PR Created',
   forwarded_to_p3: 'Forwarded to P3', confirmed: 'Confirmed', rd_generated: 'RD Generated',
   al_generated: 'AL Generated', asset_tagged: 'Asset Tagged', in_progress: 'In Progress',
   completed: 'Completed', issued: 'Issued', dispatched: 'Dispatched', open: 'Open',

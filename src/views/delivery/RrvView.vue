@@ -32,6 +32,7 @@
             <th class="px-5 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">SR Reference</th>
             <th class="px-5 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Vendor</th>
             <th class="px-5 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Status</th>
+            <th class="px-5 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Action</th>
           </tr>
         </thead>
         <tbody class="divide-y divide-slate-100">
@@ -41,8 +42,9 @@
             <td class="px-5 py-3 text-sm text-slate-600">{{ rrv.service_request?.number || '-' }}</td>
             <td class="px-5 py-3 text-sm text-slate-600">{{ rrv.vendor?.name || '-' }}</td>
             <td class="px-5 py-3"><span :class="[statusBadge(rrv.status), 'inline-flex items-center px-2.5 py-0.5 text-xs font-medium rounded-full']">{{ formatStatus(rrv.status) }}</span></td>
+            <td class="px-5 py-3 text-sm"><router-link :to="{ name: 'RrvDetail', params: { id: rrv.id } }" class="font-medium text-primary-700 hover:text-primary-800 transition-colors">View</router-link></td>
           </tr>
-          <tr v-if="!rrvs.data?.length"><td colspan="5" class="px-5 py-16 text-center text-sm text-slate-400">No RRVs found</td></tr>
+          <tr v-if="!rrvs.data?.length"><td colspan="6" class="px-5 py-16 text-center text-sm text-slate-400">No RRVs found</td></tr>
         </tbody>
       </table>
 

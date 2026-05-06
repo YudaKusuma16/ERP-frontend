@@ -36,6 +36,7 @@
             <th class="px-5 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">PIC</th>
             <th class="px-5 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Service Type</th>
             <th class="px-5 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Status</th>
+            <th class="px-5 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Action</th>
           </tr>
         </thead>
         <tbody class="divide-y divide-slate-100">
@@ -46,8 +47,9 @@
             <td class="px-5 py-3 text-sm text-slate-600">{{ wo.pic?.name || '-' }}</td>
             <td class="px-5 py-3 text-sm text-slate-600">{{ wo.service_type || '-' }}</td>
             <td class="px-5 py-3"><span :class="[woStatusBadge(wo.status), 'inline-flex items-center px-2.5 py-0.5 text-xs font-medium rounded-full']">{{ formatStatus(wo.status) }}</span></td>
+            <td class="px-5 py-3 text-sm"><router-link :to="{ name: 'WorkOrderDetail', params: { id: wo.id } }" class="font-medium text-primary-700 hover:text-primary-800 transition-colors">View</router-link></td>
           </tr>
-          <tr v-if="!wos.data?.length"><td colspan="6" class="px-5 py-16 text-center text-sm text-slate-400">No work orders found</td></tr>
+          <tr v-if="!wos.data?.length"><td colspan="7" class="px-5 py-16 text-center text-sm text-slate-400">No work orders found</td></tr>
         </tbody>
       </table>
 

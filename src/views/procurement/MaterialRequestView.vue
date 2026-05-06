@@ -42,6 +42,7 @@
             <th class="px-5 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Source</th>
             <th class="px-5 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Requestor</th>
             <th class="px-5 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Status</th>
+            <th class="px-5 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Action</th>
           </tr>
         </thead>
         <tbody class="divide-y divide-slate-100">
@@ -57,9 +58,12 @@
             <td class="px-5 py-3">
               <span :class="mrStatusBadge(mr.status)" class="inline-flex items-center px-2.5 py-0.5 text-xs font-medium rounded-full">{{ formatStatus(mr.status) }}</span>
             </td>
+            <td class="px-5 py-3 text-sm">
+              <router-link :to="{ name: 'MaterialRequestDetail', params: { id: mr.id } }" class="font-medium text-primary-700 hover:text-primary-800 transition-colors">View</router-link>
+            </td>
           </tr>
           <tr v-if="!mrs.data?.length">
-            <td colspan="5" class="px-5 py-16 text-center text-sm text-slate-400">No material requests found</td>
+            <td colspan="6" class="px-5 py-16 text-center text-sm text-slate-400">No material requests found</td>
           </tr>
         </tbody>
       </table>
@@ -98,11 +102,12 @@
             <div>
               <label class="block text-sm font-medium text-slate-700 mb-2">Items</label>
               <div v-for="(item, index) in form.items" :key="index" class="flex gap-2 mb-2 items-end">
-                <div class="flex-1">
-                  <select v-model="item.item_id" required class="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500">
-                    <option value="">Select Item</option>
+                <div class="flex-1 space-y-1">
+                  <select v-model="item.item_id" class="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500" @change="onChangeItem(index)">
+                    <option value="">Select Item (optional)</option>
                     <option v-for="mi in masterItems" :key="mi.id" :value="mi.id">{{ mi.name }} ({{ mi.unit }})</option>
                   </select>
+                  <input v-model="item.item_name" type="text" class="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500" placeholder="Or input item name manually" @input="onInputItemName(index)" />
                 </div>
                 <div class="w-24">
                   <input v-model.number="item.qty" type="number" step="0.01" min="0.01" required class="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500" placeholder="Qty" />
@@ -112,7 +117,7 @@
                 </div>
                 <button type="button" @click="form.items.splice(index, 1)" class="px-2 py-2 text-red-500 hover:text-red-700 transition-colors">&times;</button>
               </div>
-              <button type="button" @click="form.items.push({ item_id: '', qty: 1, unit: '', description: '' })" class="text-sm text-primary-600 hover:text-primary-700 font-medium transition-colors">+ Add Item</button>
+              <button type="button" @click="form.items.push({ item_id: '', item_name: '', qty: 1, unit: '', description: '' })" class="text-sm text-primary-600 hover:text-primary-700 font-medium transition-colors">+ Add Item</button>
             </div>
           </div>
           <div class="flex gap-3 justify-end mt-6">
@@ -143,7 +148,7 @@ const createError = ref('')
 const form = reactive({
   source_type: 'internal',
   notes: '',
-  items: [{ item_id: '', qty: 1, unit: '', description: '' }]
+  items: [{ item_id: '', item_name: '', qty: 1, unit: '', description: '' }]
 })
 
 onMounted(() => {
@@ -167,9 +172,14 @@ async function createMR() {
   createLoading.value = true
   createError.value = ''
   try {
+    const invalidItem = form.items.find(i => !i.item_id && !i.item_name?.trim())
+    if (invalidItem) {
+      createError.value = 'Setiap baris item harus pilih item atau isi nama item manual.'
+      return
+    }
     await api.post('/material-requests', form)
     showCreateModal.value = false
-    Object.assign(form, { source_type: 'internal', notes: '', items: [{ item_id: '', qty: 1, unit: '', description: '' }] })
+    Object.assign(form, { source_type: 'internal', notes: '', items: [{ item_id: '', item_name: '', qty: 1, unit: '', description: '' }] })
     await fetchMRs()
   } catch (err) {
     createError.value = err.response?.data?.message || 'Failed to create MR'
@@ -179,6 +189,20 @@ async function createMR() {
     }
   } finally {
     createLoading.value = false
+  }
+}
+
+function onChangeItem(index) {
+  const selected = masterItems.value.find(mi => mi.id === form.items[index].item_id)
+  if (selected) {
+    form.items[index].unit = selected.unit || form.items[index].unit
+    form.items[index].item_name = ''
+  }
+}
+
+function onInputItemName(index) {
+  if (form.items[index].item_name?.trim()) {
+    form.items[index].item_id = ''
   }
 }
 

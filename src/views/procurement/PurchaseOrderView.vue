@@ -32,6 +32,7 @@
             <th class="px-5 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Vendor</th>
             <th class="px-5 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Total Value</th>
             <th class="px-5 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Status</th>
+            <th class="px-5 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Action</th>
           </tr>
         </thead>
         <tbody class="divide-y divide-slate-100">
@@ -41,8 +42,9 @@
             <td class="px-5 py-3 text-sm text-slate-600">{{ po.vendor?.name || '-' }}</td>
             <td class="px-5 py-3 text-sm text-slate-800">{{ formatCurrency(po.total_value) }}</td>
             <td class="px-5 py-3"><span :class="poStatusBadge(po.status)" class="inline-flex items-center px-2.5 py-0.5 text-xs font-medium rounded-full">{{ formatStatus(po.status) }}</span></td>
+            <td class="px-5 py-3 text-sm"><router-link :to="{ name: 'PurchaseOrderDetail', params: { id: po.id } }" class="font-medium text-primary-700 hover:text-primary-800 transition-colors">View</router-link></td>
           </tr>
-          <tr v-if="!pos.data?.length"><td colspan="5" class="px-5 py-16 text-center text-sm text-slate-400">No purchase orders found</td></tr>
+          <tr v-if="!pos.data?.length"><td colspan="6" class="px-5 py-16 text-center text-sm text-slate-400">No purchase orders found</td></tr>
         </tbody>
       </table>
       <div v-if="pos.last_page > 1" class="flex items-center justify-between px-5 py-3 border-t border-slate-200 bg-slate-50/40">

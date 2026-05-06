@@ -33,6 +33,7 @@
             <th class="px-5 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">PO Reference</th>
             <th class="px-5 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Pihak 1</th>
             <th class="px-5 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Status</th>
+            <th class="px-5 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Action</th>
           </tr>
         </thead>
         <tbody class="divide-y divide-slate-100">
@@ -42,8 +43,9 @@
             <td class="px-5 py-3 text-sm">{{ preRd.purchase_order?.number || '-' }}</td>
             <td class="px-5 py-3 text-sm">{{ preRd.pihak1?.name || '-' }}</td>
             <td class="px-5 py-3"><span :class="statusBadge(preRd.status)" class="inline-flex items-center px-2.5 py-0.5 text-xs font-medium rounded-full">{{ formatStatus(preRd.status) }}</span></td>
+            <td class="px-5 py-3 text-sm"><router-link :to="{ name: 'PreReceivingDocumentDetail', params: { id: preRd.id } }" class="font-medium text-primary-700 hover:text-primary-800 transition-colors">View</router-link></td>
           </tr>
-          <tr v-if="!preRds.data?.length"><td colspan="5" class="px-5 py-16 text-center text-sm text-slate-400">No items found</td></tr>
+          <tr v-if="!preRds.data?.length"><td colspan="6" class="px-5 py-16 text-center text-sm text-slate-400">No items found</td></tr>
         </tbody>
       </table>
 

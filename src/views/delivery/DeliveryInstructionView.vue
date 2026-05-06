@@ -31,6 +31,7 @@
             <th class="px-5 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Date</th>
             <th class="px-5 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">MR Reference</th>
             <th class="px-5 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Status</th>
+            <th class="px-5 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Action</th>
           </tr>
         </thead>
         <tbody class="divide-y divide-slate-100">
@@ -39,8 +40,9 @@
             <td class="px-5 py-3 text-sm text-slate-600">{{ formatDate(di.date) }}</td>
             <td class="px-5 py-3 text-sm text-slate-600">{{ di.material_request?.number || '-' }}</td>
             <td class="px-5 py-3"><span :class="[statusBadge(di.status), 'inline-flex items-center px-2.5 py-0.5 text-xs font-medium rounded-full']">{{ formatStatus(di.status) }}</span></td>
+            <td class="px-5 py-3 text-sm"><router-link :to="{ name: 'DeliveryInstructionDetail', params: { id: di.id } }" class="font-medium text-primary-700 hover:text-primary-800 transition-colors">View</router-link></td>
           </tr>
-          <tr v-if="!dis.data?.length"><td colspan="4" class="px-5 py-16 text-center text-sm text-slate-400">No delivery instructions found</td></tr>
+          <tr v-if="!dis.data?.length"><td colspan="5" class="px-5 py-16 text-center text-sm text-slate-400">No delivery instructions found</td></tr>
         </tbody>
       </table>
 

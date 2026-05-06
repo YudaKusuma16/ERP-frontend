@@ -32,13 +32,15 @@ const routes = [
       {
         path: 'master/vendors',
         name: 'MasterVendors',
-        component: () => import('../views/master/MasterVendorView.vue')
+        component: () => import('../views/master/MasterVendorView.vue'),
+        meta: { allowedRoles: ['purchasing', 'accounting'] }
       },
       {
         path: 'master/vendors/:id',
         name: 'MasterVendorDetail',
         component: () => import('../views/master/MasterVendorDetailView.vue'),
-        props: true
+        props: true,
+        meta: { allowedRoles: ['purchasing', 'accounting'] }
       },
       {
         path: 'departments',
@@ -219,6 +221,14 @@ router.beforeEach(async (to) => {
 
   if (to.name === 'Login' && authStore.isAuthenticated) {
     return { name: 'Dashboard' }
+  }
+
+  if (to.meta?.allowedRoles?.length) {
+    const allowed = to.meta.allowedRoles
+    const hasAccess = allowed.some(role => authStore.hasRole(role))
+    if (!hasAccess) {
+      return { name: 'Dashboard' }
+    }
   }
 
   return true

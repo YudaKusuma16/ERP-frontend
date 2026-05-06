@@ -94,7 +94,10 @@ const pricingItems = ref([])
 const actionForm = reactive({ reason: '' })
 
 const canInputPricing = computed(() => pr.value?.status === 'auto_created' && (authStore.hasRole('pihak_1') || authStore.hasRole('user')))
-const canApprovePihak2 = computed(() => pr.value?.status === 'pending_pihak_ii' && authStore.hasRole('pihak_2'))
+const canApprovePihak2 = computed(() => {
+  if (!(pr.value?.status === 'pending_pihak_ii' && authStore.hasRole('pihak_2'))) return false
+  return Number(pr.value?.pihak1_id) !== Number(authStore.user?.id)
+})
 
 onMounted(async () => { await fetchPR(); if (canInputPricing.value) initPricing() })
 

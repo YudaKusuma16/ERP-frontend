@@ -32,6 +32,7 @@
             <th class="px-5 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Type</th>
             <th class="px-5 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Total Value</th>
             <th class="px-5 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Status</th>
+            <th class="px-5 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Action</th>
           </tr>
         </thead>
         <tbody class="divide-y divide-slate-100">
@@ -43,8 +44,9 @@
             <td class="px-5 py-3 text-sm"><span class="inline-flex items-center px-2 py-0.5 text-xs font-medium rounded" :class="pr.pr_type === 'project' ? 'bg-blue-50 text-blue-700' : 'bg-slate-100 text-slate-600'">{{ formatType(pr.pr_type) }}</span></td>
             <td class="px-5 py-3 text-sm text-slate-800">{{ formatCurrency(pr.total_value) }}</td>
             <td class="px-5 py-3"><span :class="prStatusBadge(pr.status)" class="inline-flex items-center px-2.5 py-0.5 text-xs font-medium rounded-full">{{ formatStatus(pr.status) }}</span></td>
+            <td class="px-5 py-3 text-sm"><router-link :to="{ name: 'PurchaseRequisitionDetail', params: { id: pr.id } }" class="font-medium text-primary-700 hover:text-primary-800 transition-colors">View</router-link></td>
           </tr>
-          <tr v-if="!prs.data?.length"><td colspan="5" class="px-5 py-16 text-center text-sm text-slate-400">No purchase requisitions found</td></tr>
+          <tr v-if="!prs.data?.length"><td colspan="6" class="px-5 py-16 text-center text-sm text-slate-400">No purchase requisitions found</td></tr>
         </tbody>
       </table>
       <div v-if="prs.last_page > 1" class="flex items-center justify-between px-5 py-3 border-t border-slate-200 bg-slate-50/40">

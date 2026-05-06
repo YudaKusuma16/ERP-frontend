@@ -5,7 +5,7 @@
         <h1 class="text-xl font-semibold text-slate-800">Master Vendors</h1>
         <p class="text-sm text-slate-500 mt-0.5">Manage supplier and contractor information</p>
       </div>
-      <button @click="showCreateModal = true" class="inline-flex items-center gap-1.5 px-4 py-2 bg-primary-600 text-white text-sm font-medium rounded-lg hover:bg-primary-700 transition-colors">
+      <button v-if="canInputVendor" @click="showCreateModal = true" class="inline-flex items-center gap-1.5 px-4 py-2 bg-primary-600 text-white text-sm font-medium rounded-lg hover:bg-primary-700 transition-colors">
         <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
         Add Vendor
       </button>
@@ -31,6 +31,7 @@
             <th class="px-5 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Type</th>
             <th class="px-5 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Contact</th>
             <th class="px-5 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Status</th>
+            <th class="px-5 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Action</th>
           </tr>
         </thead>
         <tbody class="divide-y divide-slate-100">
@@ -43,9 +44,12 @@
             <td class="px-5 py-3">
               <span :class="statusBadgeClass(vendor.status)" class="inline-flex items-center px-2.5 py-0.5 text-xs font-medium rounded-full">{{ formatStatus(vendor.status) }}</span>
             </td>
+            <td class="px-5 py-3 text-sm">
+              <router-link :to="{ name: 'MasterVendorDetail', params: { id: vendor.id } }" class="font-medium text-primary-700 hover:text-primary-800 transition-colors">View</router-link>
+            </td>
           </tr>
           <tr v-if="!vendors.data?.length">
-            <td colspan="4" class="px-5 py-16 text-center text-sm text-slate-400">No vendors found</td>
+            <td colspan="5" class="px-5 py-16 text-center text-sm text-slate-400">No vendors found</td>
           </tr>
         </tbody>
       </table>
@@ -97,26 +101,28 @@
               <label class="block text-sm font-medium text-slate-700 mb-1">Tax ID / NPWP</label>
               <input v-model="createForm.tax_id" type="text" class="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500" />
             </div>
-            <hr class="border-slate-200">
-            <h3 class="text-sm font-semibold text-slate-700">Bank Details</h3>
-            <div class="grid grid-cols-2 gap-4">
-              <div>
-                <label class="block text-sm font-medium text-slate-700 mb-1">Bank Name</label>
-                <input v-model="createForm.bank_name" type="text" class="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500" />
+            <template v-if="isPurchasing">
+              <hr class="border-slate-200">
+              <h3 class="text-sm font-semibold text-slate-700">Bank Details</h3>
+              <div class="grid grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-sm font-medium text-slate-700 mb-1">Bank Name</label>
+                  <input v-model="createForm.bank_name" type="text" class="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500" />
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-slate-700 mb-1">Account Number</label>
+                  <input v-model="createForm.bank_account_number" type="text" class="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500" />
+                </div>
               </div>
               <div>
-                <label class="block text-sm font-medium text-slate-700 mb-1">Account Number</label>
-                <input v-model="createForm.bank_account_number" type="text" class="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500" />
+                <label class="block text-sm font-medium text-slate-700 mb-1">Account Holder</label>
+                <input v-model="createForm.bank_account_holder" type="text" class="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500" />
               </div>
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-slate-700 mb-1">Account Holder</label>
-              <input v-model="createForm.bank_account_holder" type="text" class="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500" />
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-slate-700 mb-1">Payment Terms</label>
-              <input v-model="createForm.payment_terms" type="text" class="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500" placeholder="Net 30, COD..." />
-            </div>
+              <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1">Payment Terms</label>
+                <input v-model="createForm.payment_terms" type="text" class="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500" placeholder="Net 30, COD..." />
+              </div>
+            </template>
           </div>
           <div class="flex gap-3 justify-end mt-6">
             <button type="button" @click="showCreateModal = false" class="px-4 py-2 text-sm font-medium text-slate-600 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">Cancel</button>
@@ -129,8 +135,9 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, onMounted, computed } from 'vue'
 import api from '../../services/api'
+import { useAuthStore } from '../../stores/auth'
 
 const vendors = ref({ data: [], current_page: 1, last_page: 1 })
 const search = ref('')
@@ -139,6 +146,9 @@ const page = ref(1)
 const showCreateModal = ref(false)
 const createLoading = ref(false)
 const createError = ref('')
+const authStore = useAuthStore()
+const canInputVendor = computed(() => authStore.hasRole('purchasing') || authStore.hasRole('accounting'))
+const isPurchasing = computed(() => authStore.hasRole('purchasing'))
 
 const createForm = reactive({
   name: '', type: 'supplier', address: '', phone: '', email: '',
@@ -157,10 +167,24 @@ async function fetchVendors() {
 }
 
 async function createVendor() {
+  if (!canInputVendor.value) {
+    createError.value = 'Only Purchasing or Accounting can create vendors'
+    return
+  }
   createLoading.value = true
   createError.value = ''
   try {
-    await api.post('/master-vendors', createForm)
+    const payload = isPurchasing.value
+      ? { ...createForm }
+      : {
+          name: createForm.name,
+          type: createForm.type,
+          address: createForm.address,
+          phone: createForm.phone,
+          email: createForm.email,
+          tax_id: createForm.tax_id
+        }
+    await api.post('/master-vendors', payload)
     showCreateModal.value = false
     Object.assign(createForm, { name: '', type: 'supplier', address: '', phone: '', email: '', tax_id: '', bank_name: '', bank_account_number: '', bank_account_holder: '', payment_terms: '' })
     await fetchVendors()
