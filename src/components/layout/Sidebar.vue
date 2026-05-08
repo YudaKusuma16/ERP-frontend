@@ -46,6 +46,7 @@ const detailRouteMap = {
   DeliveryNoteDetail: 'DeliveryNotes',
   RrvDetail: 'Rrvs',
   OrderRequestFormDetail: 'OrderRequestForms',
+  SalesOrderDetail: 'SalesOrders',
 }
 
 function resolveRoute(name) {
@@ -63,6 +64,7 @@ const menuItems = [
   { label: 'Purchase', route: 'PurchaseRequisitions', iconComponent: markRaw(ShoppingCartIcon) },
   { label: 'Docs', route: 'PreReceivingDocuments', iconComponent: markRaw(DocumentTextIcon) },
   { label: 'Order Request Forms', route: 'OrderRequestForms', iconComponent: markRaw(DocumentTextIcon) },
+  { label: 'Sales Orders', route: 'SalesOrders', iconComponent: markRaw(DocumentTextIcon) },
   { label: 'Work Orders', route: 'WorkOrders', iconComponent: markRaw(WrenchIcon) },
   { label: 'Acceptance Letters', route: 'AcceptanceLetters', iconComponent: markRaw(CheckBadgeIcon) },
   { label: 'Delivery', route: 'DeliveryInstructions', iconComponent: markRaw(TruckIcon) },

@@ -222,9 +222,20 @@ const routes = [
         component: () => import('../views/delivery/WorkOrderView.vue')
       },
       {
+        path: 'delivery/sales-orders',
+        name: 'SalesOrders',
+        component: () => import('../views/delivery/SalesOrderView.vue')
+      },
+      {
         path: 'delivery/work-orders/:id',
         name: 'WorkOrderDetail',
         component: () => import('../views/delivery/WorkOrderDetailView.vue'),
+        props: true
+      },
+      {
+        path: 'delivery/sales-orders/:id',
+        name: 'SalesOrderDetail',
+        component: () => import('../views/delivery/SalesOrderDetailView.vue'),
         props: true
       },
       {
