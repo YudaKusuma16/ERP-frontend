@@ -20,6 +20,28 @@
               <div><p class="text-sm text-gray-500">Created By</p><p class="font-medium">{{ dn.creator?.name || '-' }}</p></div>
             </div>
           </div>
+
+          <div v-if="dn.delivery_instruction?.material_request?.line_items?.length" class="bg-white rounded-lg shadow p-6 mb-6">
+            <h2 class="text-lg font-semibold mb-4">Items</h2>
+            <table class="w-full">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Item</th>
+                  <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Qty</th>
+                  <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Unit</th>
+                  <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Description</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-gray-200">
+                <tr v-for="li in dn.delivery_instruction.material_request.line_items" :key="li.id">
+                  <td class="px-4 py-3 text-sm">{{ li.item?.name || li.item_name || '-' }}</td>
+                  <td class="px-4 py-3 text-sm">{{ li.qty }}</td>
+                  <td class="px-4 py-3 text-sm">{{ li.unit }}</td>
+                  <td class="px-4 py-3 text-sm">{{ li.description || '-' }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
         <div class="space-y-6">
           <div v-if="dn.status === 'draft'" class="bg-white rounded-lg shadow p-6">

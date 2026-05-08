@@ -66,6 +66,9 @@
           </div>
           <div v-if="canUpdateItems" class="bg-white rounded-lg shadow p-6">
             <h2 class="text-lg font-semibold mb-4">Update Item Status</h2>
+            <div v-if="!updateForm.length" class="text-sm text-gray-500">
+              No line items to update yet. Please add line items first.
+            </div>
             <div v-for="(line, idx) in updateForm" :key="idx" class="flex gap-2 mb-2 items-center">
               <span class="text-sm flex-1">{{ line.item_name }}</span>
               <select v-model="line.item_status" class="px-2 py-1 border rounded text-sm">
@@ -75,7 +78,7 @@
               </select>
               <input v-model="line.location" type="text" class="w-28 px-2 py-1 border rounded text-sm" placeholder="Location" />
             </div>
-            <button @click="updateLineItems" :disabled="actionLoading" class="mt-2 px-4 py-2 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700 disabled:opacity-50">{{ actionLoading ? 'Saving...' : 'Save Updates' }}</button>
+            <button @click="updateLineItems" :disabled="actionLoading || !updateForm.length" class="mt-2 px-4 py-2 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700 disabled:opacity-50">{{ actionLoading ? 'Saving...' : 'Save Updates' }}</button>
           </div>
           <AuditTrail :logs="al.approval_logs" />
         </div>
@@ -100,9 +103,9 @@ const actionForm = reactive({ reason: '' })
 const newItemForm = reactive([])
 const updateForm = reactive([])
 
-const canAddItems = computed(() => ['auto_created', 'pending_approval'].includes(al.value?.status))
+const canAddItems = computed(() => false)
 const canApprove = computed(() => ['pending_approval', 'approved', 'in_progress'].includes(al.value?.status))
-const canUpdateItems = computed(() => al.value?.status === 'in_progress')
+const canUpdateItems = computed(() => ['approved', 'in_progress'].includes(al.value?.status))
 const nextActionLabel = computed(() => {
   if (al.value?.status === 'pending_approval') return 'Approve'
   if (al.value?.status === 'approved') return 'Start Progress'
@@ -114,7 +117,11 @@ onMounted(() => fetchAL())
 
 async function fetchAL() {
   loading.value = true
-  try { const r = await api.get(`/acceptance-letters/${route.params.id}`); al.value = r.data.acceptance_letter }
+  try {
+    const r = await api.get(`/acceptance-letters/${route.params.id}`)
+    al.value = r.data.acceptance_letter
+    if (canUpdateItems.value && al.value?.line_items?.length) startUpdateForm()
+  }
   finally { loading.value = false }
 }
 

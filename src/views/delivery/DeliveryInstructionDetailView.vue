@@ -24,6 +24,28 @@
             <router-link :to="{ name: 'DeliveryNoteDetail', params: { id: di.delivery_note.id } }" class="text-blue-600 hover:underline">{{ di.delivery_note.number }}</router-link>
             <span :class="dnStatusBadge(di.delivery_note.status)" class="ml-2 px-2 py-1 text-xs rounded-full">{{ formatDnStatus(di.delivery_note.status) }}</span>
           </div>
+
+          <div v-if="di.material_request?.line_items?.length" class="bg-white rounded-lg shadow p-6 mt-6">
+            <h2 class="text-lg font-semibold mb-4">Items</h2>
+            <table class="w-full">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Item</th>
+                  <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Qty</th>
+                  <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Unit</th>
+                  <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Description</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-gray-200">
+                <tr v-for="li in di.material_request.line_items" :key="li.id">
+                  <td class="px-4 py-3 text-sm">{{ li.item?.name || li.item_name || '-' }}</td>
+                  <td class="px-4 py-3 text-sm">{{ li.qty }}</td>
+                  <td class="px-4 py-3 text-sm">{{ li.unit }}</td>
+                  <td class="px-4 py-3 text-sm">{{ li.description || '-' }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
         <div class="space-y-6">
           <div v-if="di.status === 'draft'" class="bg-white rounded-lg shadow p-6">

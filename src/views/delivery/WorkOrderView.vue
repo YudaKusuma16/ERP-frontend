@@ -43,7 +43,7 @@
           <tr v-for="wo in wos.data" :key="wo.id" class="hover:bg-slate-50/50 transition-colors">
             <td class="px-5 py-3 text-sm"><router-link :to="{ name: 'WorkOrderDetail', params: { id: wo.id } }" class="font-medium text-primary-700 hover:text-primary-800 transition-colors">{{ wo.number }}</router-link></td>
             <td class="px-5 py-3 text-sm text-slate-600">{{ formatDate(wo.date) }}</td>
-            <td class="px-5 py-3 text-sm text-slate-600">{{ wo.orf_ref || '-' }}</td>
+            <td class="px-5 py-3 text-sm text-slate-600">{{ wo.order_request_form?.number || wo.orf_ref || '-' }}</td>
             <td class="px-5 py-3 text-sm text-slate-600">{{ wo.pic?.name || '-' }}</td>
             <td class="px-5 py-3 text-sm text-slate-600">{{ wo.service_type || '-' }}</td>
             <td class="px-5 py-3"><span :class="[woStatusBadge(wo.status), 'inline-flex items-center px-2.5 py-0.5 text-xs font-medium rounded-full']">{{ formatStatus(wo.status) }}</span></td>
@@ -69,10 +69,70 @@
         <div v-if="createError" class="bg-red-50 text-red-700 text-sm p-3 rounded-lg mb-4 border border-red-200">{{ createError }}</div>
         <form @submit.prevent="createWO">
           <div class="space-y-4">
-            <div><label class="block text-sm font-medium text-slate-700 mb-1">ORF Reference</label><input v-model="form.orf_ref" type="text" class="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500" placeholder="ORF number (optional)" /></div>
+            <div>
+              <label class="block text-sm font-medium text-slate-700 mb-1">ORF</label>
+              <select v-model="form.orf_id" class="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 bg-white">
+                <option value="">Select ORF (optional)</option>
+                <option v-for="o in orfs" :key="o.id" :value="o.id">{{ o.number }}{{ o.customer_name ? ` - ${o.customer_name}` : '' }}</option>
+              </select>
+              <p class="text-xs text-slate-500 mt-1">If ORF is selected, ORF Reference will be auto-filled.</p>
+            </div>
+            <div><label class="block text-sm font-medium text-slate-700 mb-1">ORF Reference</label><input v-model="form.orf_ref" :disabled="!!form.orf_id" type="text" class="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 disabled:bg-slate-50 disabled:text-slate-500" placeholder="ORF number (optional)" /></div>
             <div><label class="block text-sm font-medium text-slate-700 mb-1">Service Type</label><input v-model="form.service_type" type="text" class="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500" placeholder="e.g. Rental, Installation" /></div>
             <div><label class="block text-sm font-medium text-slate-700 mb-1">Job Details</label><textarea v-model="form.job_details" class="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500" rows="3" placeholder="Describe the job..."></textarea></div>
             <div><label class="block text-sm font-medium text-slate-700 mb-1">PIC (Person in Charge)</label><select v-model="form.pic_id" class="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500"><option value="">Select PIC</option><option v-for="u in users" :key="u.id" :value="u.id">{{ u.name }}</option></select></div>
+
+            <div class="pt-2">
+              <div class="flex items-center justify-between">
+                <div>
+                  <p class="text-sm font-semibold text-slate-800">Material Request (optional)</p>
+                  <p class="text-xs text-slate-500 mt-0.5">If you add items here, the system will auto-create MR from this WO.</p>
+                </div>
+                <button type="button" @click="addMrItem" class="inline-flex items-center gap-1.5 px-3 py-1.5 border border-slate-200 rounded-lg text-xs font-medium text-slate-700 hover:bg-slate-50 transition-colors">
+                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
+                  Add Item
+                </button>
+              </div>
+
+              <div class="mt-3 space-y-3" v-if="form.mr_items.length">
+                <div>
+                  <label class="block text-sm font-medium text-slate-700 mb-1">MR Notes</label>
+                  <textarea v-model="form.mr_notes" class="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500" rows="2" placeholder="Optional"></textarea>
+                </div>
+
+                <div v-for="(it, idx) in form.mr_items" :key="idx" class="border border-slate-200 rounded-lg p-3 bg-slate-50/40">
+                  <div class="grid grid-cols-1 md:grid-cols-12 gap-3 items-end">
+                    <div class="md:col-span-5">
+                      <label class="block text-xs font-medium text-slate-600 mb-1">Item</label>
+                      <select v-model="it.item_id" class="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 bg-white" @change="() => { if (it.item_id) it.item_name = '' }">
+                        <option value="">Manual input</option>
+                        <option v-for="mi in masterItems" :key="mi.id" :value="mi.id">{{ mi.name }}</option>
+                      </select>
+                      <div v-if="!it.item_id" class="mt-2">
+                        <input v-model="it.item_name" type="text" class="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 bg-white" placeholder="Type item name..." />
+                      </div>
+                    </div>
+                    <div class="md:col-span-2">
+                      <label class="block text-xs font-medium text-slate-600 mb-1">Qty</label>
+                      <input v-model="it.qty" type="number" min="0.01" step="0.01" class="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 bg-white" />
+                    </div>
+                    <div class="md:col-span-2">
+                      <label class="block text-xs font-medium text-slate-600 mb-1">Unit</label>
+                      <input v-model="it.unit" type="text" class="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 bg-white" />
+                    </div>
+                    <div class="md:col-span-2">
+                      <button type="button" @click="removeMrItem(idx)" class="w-full px-3 py-2 text-sm font-medium text-red-700 border border-red-200 rounded-lg hover:bg-red-50 transition-colors">
+                        Remove
+                      </button>
+                    </div>
+                    <div class="md:col-span-12">
+                      <label class="block text-xs font-medium text-slate-600 mb-1">Description</label>
+                      <input v-model="it.description" type="text" class="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 bg-white" placeholder="Optional" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
           <div class="flex gap-3 justify-end mt-6">
             <button type="button" @click="showCreateModal = false" class="px-4 py-2 text-sm font-medium text-slate-600 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">Cancel</button>
@@ -91,15 +151,25 @@ import api from '../../services/api'
 
 const wos = ref({ data: [], current_page: 1, last_page: 1 })
 const users = ref([])
+const orfs = ref([])
+const masterItems = ref([])
 const search = ref('')
 const statusFilter = ref('')
 const page = ref(1)
 const showCreateModal = ref(false)
 const createLoading = ref(false)
 const createError = ref('')
-const form = reactive({ orf_ref: '', service_type: '', job_details: '', pic_id: '' })
+const form = reactive({
+  orf_id: '',
+  orf_ref: '',
+  service_type: '',
+  job_details: '',
+  pic_id: '',
+  mr_notes: '',
+  mr_items: [],
+})
 
-onMounted(() => { fetchWOs(); fetchUsers() })
+onMounted(() => { fetchWOs(); fetchUsers(); fetchORFs(); fetchMasterItems() })
 
 async function fetchWOs() {
   const response = await api.get('/work-orders', { params: { page: page.value, search: search.value || undefined, status: statusFilter.value || undefined } })
@@ -111,12 +181,54 @@ async function fetchUsers() {
   users.value = response.data.data || []
 }
 
+async function fetchORFs() {
+  const response = await api.get('/order-request-forms', { params: { per_page: 100, status: 'approved' } })
+  orfs.value = response.data.data || []
+}
+
+async function fetchMasterItems() {
+  const response = await api.get('/master-items', { params: { per_page: 200 } })
+  masterItems.value = (response.data.data || []).filter(i => i.status === 'active')
+}
+
+function addMrItem() {
+  form.mr_items.push({ item_id: '', item_name: '', qty: 1, unit: 'pcs', description: '' })
+}
+
+function removeMrItem(idx) {
+  form.mr_items.splice(idx, 1)
+}
+
 async function createWO() {
   createLoading.value = true; createError.value = ''
   try {
-    await api.post('/work-orders', form)
+    const woPayload = {
+      orf_id: form.orf_id || null,
+      orf_ref: form.orf_ref || null,
+      service_type: form.service_type || null,
+      job_details: form.job_details || null,
+      pic_id: form.pic_id || null,
+    }
+
+    const woRes = await api.post('/work-orders', woPayload)
+    const woId = woRes.data?.work_order?.id
+
+    if (woId && form.mr_items.length) {
+      const mrPayload = {
+        notes: form.mr_notes || null,
+        items: form.mr_items.map(i => ({
+          item_id: i.item_id || null,
+          item_name: i.item_id ? null : (i.item_name || null),
+          qty: Number(i.qty),
+          unit: i.unit,
+          description: i.description || null,
+        })),
+      }
+      await api.post(`/work-orders/${woId}/material-requests`, mrPayload)
+    }
+
     showCreateModal.value = false
-    Object.assign(form, { orf_ref: '', service_type: '', job_details: '', pic_id: '' })
+    Object.assign(form, { orf_id: '', orf_ref: '', service_type: '', job_details: '', pic_id: '', mr_notes: '', mr_items: [] })
     await fetchWOs()
   } catch (err) { createError.value = err.response?.data?.message || 'Failed to create WO' }
   finally { createLoading.value = false }

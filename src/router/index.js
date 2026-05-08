@@ -182,6 +182,17 @@ const routes = [
             redirect: { name: 'DeliveryInstructions' }
           },
           {
+            path: 'order-request-forms',
+            name: 'OrderRequestForms',
+            component: () => import('../views/delivery/OrderRequestFormView.vue')
+          },
+          {
+            path: 'order-request-forms/:id',
+            name: 'OrderRequestFormDetail',
+            component: () => import('../views/delivery/OrderRequestFormDetailView.vue'),
+            props: true
+          },
+          {
             path: 'instructions',
             name: 'DeliveryInstructions',
             component: () => import('../views/delivery/DeliveryInstructionView.vue')

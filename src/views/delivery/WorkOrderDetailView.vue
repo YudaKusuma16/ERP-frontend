@@ -14,7 +14,7 @@
             <div class="grid grid-cols-2 gap-4">
               <div><p class="text-sm text-gray-500">Number</p><p class="font-medium">{{ wo.number }}</p></div>
               <div><p class="text-sm text-gray-500">Date</p><p class="font-medium">{{ formatDate(wo.date) }}</p></div>
-              <div><p class="text-sm text-gray-500">ORF Reference</p><p class="font-medium">{{ wo.orf_ref || '-' }}</p></div>
+              <div><p class="text-sm text-gray-500">ORF</p><p class="font-medium">{{ wo.order_request_form?.number || wo.orf_ref || '-' }}</p></div>
               <div><p class="text-sm text-gray-500">Service Type</p><p class="font-medium">{{ wo.service_type || '-' }}</p></div>
               <div><p class="text-sm text-gray-500">PIC</p><p class="font-medium">{{ wo.pic?.name || '-' }}</p></div>
               <div><p class="text-sm text-gray-500">Created By</p><p class="font-medium">{{ wo.creator?.name || '-' }}</p></div>
@@ -26,6 +26,35 @@
             <h2 class="text-lg font-semibold mb-4">Acceptance Letter</h2>
             <router-link :to="{ name: 'AcceptanceLetterDetail', params: { id: wo.acceptance_letter.id } }" class="text-blue-600 hover:underline">{{ wo.acceptance_letter.number }}</router-link>
             <span :class="alStatusBadge(wo.acceptance_letter.status)" class="ml-2 px-2 py-1 text-xs rounded-full">{{ formatAlStatus(wo.acceptance_letter.status) }}</span>
+          </div>
+
+          <div v-if="wo.material_requests?.length" class="bg-white rounded-lg shadow p-6 mt-6">
+            <h2 class="text-lg font-semibold mb-4">Material Requests</h2>
+            <div v-for="mr in wo.material_requests" :key="mr.id" class="border border-slate-200 rounded-lg p-4 mb-4">
+              <div class="flex items-center justify-between">
+                <router-link :to="{ name: 'MaterialRequestDetail', params: { id: mr.id } }" class="text-blue-600 hover:underline font-medium">{{ mr.number }}</router-link>
+                <span class="text-xs text-slate-500">{{ mr.status }}</span>
+              </div>
+              <table v-if="mr.line_items?.length" class="w-full mt-3">
+                <thead class="bg-slate-50">
+                  <tr>
+                    <th class="px-3 py-2 text-left text-xs font-medium text-slate-600">Item</th>
+                    <th class="px-3 py-2 text-left text-xs font-medium text-slate-600">Qty</th>
+                    <th class="px-3 py-2 text-left text-xs font-medium text-slate-600">Unit</th>
+                    <th class="px-3 py-2 text-left text-xs font-medium text-slate-600">Desc</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                  <tr v-for="li in mr.line_items" :key="li.id">
+                    <td class="px-3 py-2 text-sm">{{ li.item?.name || li.item_name || '-' }}</td>
+                    <td class="px-3 py-2 text-sm">{{ li.qty }}</td>
+                    <td class="px-3 py-2 text-sm">{{ li.unit }}</td>
+                    <td class="px-3 py-2 text-sm">{{ li.description || '-' }}</td>
+                  </tr>
+                </tbody>
+              </table>
+              <div v-else class="text-sm text-slate-500 mt-2">No items.</div>
+            </div>
           </div>
         </div>
         <div class="space-y-6">
