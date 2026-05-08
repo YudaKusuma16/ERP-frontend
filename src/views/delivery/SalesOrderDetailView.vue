@@ -25,6 +25,82 @@
               <p class="text-sm text-red-700"><strong>Decline Reason:</strong> {{ so.decline_reason }}</p>
             </div>
           </div>
+
+          <div class="bg-white rounded-lg shadow p-6 mb-6">
+            <div class="flex items-center justify-between mb-4">
+              <h2 class="text-lg font-semibold">Material Requests</h2>
+              <div v-if="so.status === 'approved'">
+                <button @click="openMrModal" class="px-3 py-2 bg-primary-600 text-white rounded-md text-sm hover:bg-primary-700">Create MR</button>
+              </div>
+            </div>
+
+            <div v-if="!so.material_requests?.length" class="text-sm text-slate-500">
+              No Material Request yet.
+            </div>
+
+            <div v-else class="space-y-3">
+              <div v-for="mr in so.material_requests" :key="mr.id" class="border border-slate-200 rounded-lg p-4">
+                <div class="flex flex-wrap items-center justify-between gap-2">
+                  <div class="text-sm">
+                    <div class="font-semibold text-slate-800">
+                      MR:
+                      <router-link :to="{ name: 'MaterialRequestDetail', params: { id: mr.id } }" class="text-primary-700 hover:underline">
+                        {{ mr.number }}
+                      </router-link>
+                    </div>
+                    <div class="text-slate-500">
+                      Status: <span class="font-medium text-slate-700">{{ mr.status }}</span>
+                      <span v-if="mr.date"> · Date: {{ formatDate(mr.date) }}</span>
+                    </div>
+                  </div>
+
+                  <div class="text-sm text-slate-600">
+                    <div v-if="mr.delivery_instruction">
+                      DI:
+                      <router-link :to="{ name: 'DeliveryInstructionDetail', params: { id: mr.delivery_instruction.id } }" class="text-primary-700 hover:underline">
+                        {{ mr.delivery_instruction.number }}
+                      </router-link>
+                      <span class="text-slate-500">({{ mr.delivery_instruction.status }})</span>
+                    </div>
+                    <div v-else class="text-slate-400">DI: -</div>
+
+                    <div v-if="mr.delivery_instruction?.delivery_note" class="mt-0.5">
+                      DN:
+                      <router-link :to="{ name: 'DeliveryNoteDetail', params: { id: mr.delivery_instruction.delivery_note.id } }" class="text-primary-700 hover:underline">
+                        {{ mr.delivery_instruction.delivery_note.number }}
+                      </router-link>
+                      <span class="text-slate-500">({{ mr.delivery_instruction.delivery_note.status }})</span>
+                    </div>
+                    <div v-else class="text-slate-400 mt-0.5">DN: -</div>
+                  </div>
+                </div>
+
+                <div class="mt-3">
+                  <div class="text-xs font-semibold text-slate-600 mb-2">Items</div>
+                  <div class="overflow-x-auto">
+                    <table class="min-w-full text-sm">
+                      <thead>
+                        <tr class="text-left text-xs text-slate-500 border-b border-slate-200">
+                          <th class="py-2 pr-3">Item</th>
+                          <th class="py-2 pr-3">Qty</th>
+                          <th class="py-2 pr-3">Unit</th>
+                          <th class="py-2 pr-3">Description</th>
+                        </tr>
+                      </thead>
+                      <tbody class="divide-y divide-slate-100">
+                        <tr v-for="li in (mr.line_items || [])" :key="li.id">
+                          <td class="py-2 pr-3">{{ li.item?.name || li.item_name || 'N/A' }}</td>
+                          <td class="py-2 pr-3">{{ li.qty }}</td>
+                          <td class="py-2 pr-3">{{ li.unit }}</td>
+                          <td class="py-2 pr-3">{{ li.description || '-' }}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
         <div class="space-y-6">
@@ -47,9 +123,10 @@
           </div>
 
           <div v-if="so.status === 'approved'" class="bg-white rounded-lg shadow p-6">
-            <h2 class="text-lg font-semibold mb-4">Material Request</h2>
-            <p class="text-sm text-gray-600 mb-3">Create Material Request from this SO (then continue to DI → DN).</p>
-            <button @click="openMrModal" class="px-4 py-2 bg-primary-600 text-white rounded-md text-sm hover:bg-primary-700">Create MR</button>
+            <h2 class="text-lg font-semibold mb-4">Next Step</h2>
+            <p class="text-sm text-gray-600">
+              Create MR first. After that, DI and DN will follow during the process.
+            </p>
           </div>
         </div>
       </div>
@@ -192,12 +269,9 @@ async function createMR() {
       })),
     }
     const r = await api.post(`/sales-orders/${route.params.id}/material-requests`, payload)
-    const mrId = r.data?.mr?.id
-    const diId = r.data?.delivery_instruction?.id
     showMrModal.value = false
     Object.assign(mrForm, { notes: '', items: [] })
-    if (diId) router.push({ name: 'DeliveryInstructionDetail', params: { id: diId } })
-    else if (mrId) router.push({ name: 'MaterialRequestDetail', params: { id: mrId } })
+    await fetchSO()
   } catch (err) {
     mrError.value = err.response?.data?.message || 'Failed to create MR'
   } finally {
