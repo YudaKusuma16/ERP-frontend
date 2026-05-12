@@ -177,7 +177,18 @@ async function createMR() {
       createError.value = 'Setiap baris item harus pilih item atau isi nama item manual.'
       return
     }
-    await api.post('/material-requests', form)
+    const payload = {
+      source_type: form.source_type,
+      notes: form.notes || null,
+      items: form.items.map(i => ({
+        item_id: i.item_id || null,
+        item_name: i.item_id ? null : (i.item_name || null),
+        qty: Number(i.qty),
+        unit: i.unit,
+        description: i.description || null,
+      })),
+    }
+    await api.post('/material-requests', payload)
     showCreateModal.value = false
     Object.assign(form, { source_type: 'internal', notes: '', items: [{ item_id: '', item_name: '', qty: 1, unit: '', description: '' }] })
     await fetchMRs()

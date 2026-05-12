@@ -4,12 +4,7 @@
       <router-link to="/" class="hover:text-slate-700">Home</router-link>
     </div>
     <div class="flex items-center gap-5">
-      <router-link :to="{ name: 'Notifications' }" class="relative text-slate-400 hover:text-slate-600 transition-colors">
-        <BellIcon class="w-5 h-5" />
-        <span v-if="notificationStore.unreadCount > 0" class="absolute -top-1.5 -right-1.5 bg-red-500 text-white text-[10px] font-semibold rounded-full h-4 min-w-4 flex items-center justify-center px-1">
-          {{ notificationStore.unreadCount > 9 ? '9+' : notificationStore.unreadCount }}
-        </span>
-      </router-link>
+      <NotificationDropdown />
       <div class="h-6 w-px bg-slate-200"></div>
       <div class="flex items-center gap-3">
         <div class="w-8 h-8 rounded-full bg-primary-500 flex items-center justify-center text-white text-xs font-semibold">
@@ -25,21 +20,15 @@
 </template>
 
 <script setup>
-import { onMounted } from 'vue'
 import { useAuthStore } from '../../stores/auth'
-import { useNotificationStore } from '../../stores/notification'
 import { useRouter } from 'vue-router'
-import { BellIcon } from '@heroicons/vue/24/outline'
+import NotificationDropdown from '../NotificationDropdown.vue'
 
 const authStore = useAuthStore()
-const notificationStore = useNotificationStore()
 const router = useRouter()
 
-onMounted(() => {
-  notificationStore.fetchUnreadCount()
-})
-
 function handleLogout() {
+  sessionStorage.removeItem('notif_popup_shown')
   authStore.logout()
   router.push({ name: 'Login' })
 }
