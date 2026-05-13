@@ -17,23 +17,24 @@
       leave-to-class="transform opacity-0 translate-y-2"
     >
       <div
-        v-if="showNotifPopup"
+        v-if="showNotifPopup && notifStore.unreadCount > 0"
         class="fixed bottom-6 right-6 z-50 w-[300px]"
       >
         <div
-          class="relative bg-primary-600 rounded-xl shadow-lg px-5 py-4 cursor-pointer hover:bg-primary-700 transition-colors"
+          class="relative rounded-xl px-5 py-4 cursor-pointer transition-colors"
+          style="background: rgba(0,0,0,0.1); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); border: 1px solid rgba(0,0,0,0.1); box-shadow: 0 8px 32px rgba(0,0,0,0.15);"
           @click="goToNotifications"
         >
-          <button @click.stop="dismissPopup" class="absolute top-3 right-3 text-white/50 hover:text-white transition-colors">
+          <button @click.stop="dismissPopup" class="absolute top-3 right-3 text-black/50 hover:text-black transition-colors">
             <XMarkIcon class="w-5 h-5" />
           </button>
           <div class="flex items-center gap-3">
-            <div class="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
-              <BellIcon class="w-4 h-4 text-white" />
+            <div class="w-8 h-8 rounded-full bg-black/10 flex items-center justify-center">
+              <BellIcon class="w-4 h-4 text-black" />
             </div>
             <div>
-              <p class="text-sm font-semibold text-white">New Notifications</p>
-              <p class="text-xs text-primary-100">You have {{ notifStore.unreadCount }} unread notification{{ notifStore.unreadCount > 1 ? 's' : '' }}</p>
+              <p class="text-sm font-semibold text-black">New Notifications</p>
+              <p class="text-xs text-black/70">You have {{ notifStore.unreadCount }} unread notification{{ notifStore.unreadCount > 1 ? 's' : '' }}</p>
             </div>
           </div>
         </div>

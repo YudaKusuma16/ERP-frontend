@@ -24,6 +24,7 @@
           <div><p class="text-sm text-gray-500">COA</p><p class="font-medium">{{ item.coa || '-' }}</p></div>
           <div><p class="text-sm text-gray-500">Created By</p><p class="font-medium">{{ item.created_by?.name || '-' }}</p></div>
           <div><p class="text-sm text-gray-500">Validated By</p><p class="font-medium">{{ item.validated_by?.name || '-' }}</p></div>
+          <div><p class="text-sm text-gray-500">Barcode</p><p class="font-medium flex items-center gap-1.5">{{ item.barcode || '-' }}<button v-if="item.barcode" @click="showBarcodeModal = true" class="inline-flex items-center gap-1 text-xs text-slate-500 hover:text-slate-800 border border-slate-300 rounded px-1.5 py-0.5 hover:bg-slate-50 transition-colors"><svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 4.875c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5A1.125 1.125 0 0 1 3.75 9.375v-4.5ZM3.75 14.625c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5A1.125 1.125 0 0 1 3.75 19.125v-4.5ZM13.125 3.375c-.621 0-1.125.504-1.125 1.125v4.5c0 .621.504 1.125 1.125 1.125h4.5c.621 0 1.125-.504 1.125-1.125v-4.5A1.125 1.125 0 0 0 17.625 3.375h-4.5Z"/><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 6.75h.75v.75h-.75v-.75ZM6.75 16.5h.75v.75h-.75v-.75ZM16.5 6.75h.75v.75h-.75v-.75ZM13.5 13.5h.75v.75h-.75v-.75ZM13.5 19.5h.75v.75h-.75v-.75ZM19.5 13.5h.75v.75h-.75v-.75ZM19.5 19.5h.75v.75h-.75v-.75ZM16.5 16.5h.75v.75h-.75v-.75Z"/></svg>QR</button></p></div>
         </div>
         <div v-if="item.decline_reason" class="mt-4 p-3 bg-red-50 rounded">
           <p class="text-sm text-red-700"><strong>Decline Reason:</strong> {{ item.decline_reason }}</p>
@@ -57,6 +58,8 @@
 
       <AuditTrail :logs="auditTrail" />
     </div>
+
+    <BarcodeModal :visible="showBarcodeModal" :value="item?.barcode || ''" :itemName="item?.name || ''" @close="showBarcodeModal = false" />
 
     <div v-if="showDeclineModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div class="bg-white rounded-lg shadow-xl p-6 w-full max-w-md">
@@ -111,6 +114,7 @@ import { useRoute } from 'vue-router'
 import { useAuthStore } from '../../stores/auth'
 import api from '../../services/api'
 import AuditTrail from '../../components/AuditTrail.vue'
+import BarcodeModal from '../../components/BarcodeModal.vue'
 
 const props = defineProps({ id: [String, Number] })
 const route = useRoute()
@@ -123,6 +127,7 @@ const validateLoading = ref(false)
 const validateError = ref('')
 const showDeclineModal = ref(false)
 const showResubmitModal = ref(false)
+const showBarcodeModal = ref(false)
 
 const validateForm = reactive({
   category: '',
